@@ -1,4 +1,4 @@
-package org.lorislab.vertx.sql.mapper;
+package org.lorislab.vertx.sql.mapper.impl;
 
 import com.squareup.javapoet.*;
 import io.vertx.core.json.JsonObject;
@@ -15,7 +15,7 @@ import java.util.List;
 public class SqlMapperImpClassWriter {
 
     private final TypeElement beanType;
-    private final ClassModel  classModel;
+    private final ClassModel classModel;
 
     public SqlMapperImpClassWriter(TypeElement beanType, ClassModel classModel) {
         this.beanType = beanType;
@@ -42,23 +42,22 @@ public class SqlMapperImpClassWriter {
             TypeName parameterType = TypeName.get(p1.asType());
             DeclaredType ddd = (DeclaredType)element.getReturnType();
 
-            Element ee = ddd.asElement();
-                    //classModel.getEnv().getElementUtils().getTypeElement(element.getReturnType().toString());
-
             List<Element> fields = new ArrayList<>();
-            for (Element f : ee.getEnclosedElements()) {
+            for (Element f : ddd.asElement().getEnclosedElements()) {
                 if (f.getKind() == ElementKind.FIELD) {
                     fields.add(f);
                 }
             }
 
+            Name row = p1.getSimpleName();
+
             MethodSpec.Builder mb = MethodSpec.overriding(element)
-                    .beginControlFlow("if ($N == null)", p1.getSimpleName())
+                    .beginControlFlow("if ($N == null)", row)
                     .addStatement("return null")
                     .endControlFlow()
                     .addStatement("$T result = new $T()", returnType, returnType);
 
-            Name row = p1.getSimpleName();
+
             for (Element field : fields) {
                 Name fName = field.getSimpleName();
                 TypeMirror tm = field.asType();
@@ -67,38 +66,54 @@ public class SqlMapperImpClassWriter {
                 if (eee.getKind() == ElementKind.INTERFACE) {
                     TypeElement tdd = (TypeElement) eee;
 
-                    System.out.println("### " + tdd.getQualifiedName() + " " + dt.getTypeArguments());
                     switch (tdd.getQualifiedName().toString()) {
-                        case "java.util.Set":
+                        case Types.SET:
                             TypeMirror etm = dt.getTypeArguments().get(0);
                             switch (etm.toString()) {
-                                case "java.lang.String":
+                                case Types.STRING:
                                     mb.addStatement("result.$N = new $T<>($T.asList($N.getStringArray($S)))", fName, HashSet.class, Arrays.class, row, fName);
                                     break;
-                                case "java.lang.Long":
+                                case Types.LONG:
                                     mb.addStatement("result.$N = new $T<>($T.asList($N.getLongArray($S)))", fName, HashSet.class, Arrays.class, row, fName);
                                     break;
                             }
                     }
                 } else if (eee.getKind() == ElementKind.ENUM) {
                     String tmp = "result_" + fName;
-                    mb.addStatement("String $N = $N.getString($S)", tmp, row, fName);
-                    mb.beginControlFlow("if ($N != null)", tmp);
-                    mb.addStatement("result.$N = $T.valueOf($N)", fName, tm, tmp);
-                    mb.endControlFlow();
+                    switch (tm.toString()) {
+                        case Types.STRING:
+                            mb.addStatement("String $N = $N.getString($S)", tmp, row, fName);
+                            mb.beginControlFlow("if ($N != null)", tmp);
+                            mb.addStatement("result.$N = $T.valueOf($N)", fName, tm, tmp);
+                            mb.endControlFlow();
+                            break;
+                        case Types.LONG:
+                            mb.addStatement("Integer $N = $N.getLong($S)", tmp, row, fName);
+                            mb.beginControlFlow("if ($N != null)", tmp);
+                            mb.addStatement("result.$N = $T.values()[$N]", fName, tm, tmp);
+                            mb.endControlFlow();
+                        case Types.INTEGER:
+                            mb.addStatement("Integer $N = $N.getInteger($S)", tmp, row, fName);
+                            mb.beginControlFlow("if ($N != null)", tmp);
+                            mb.addStatement("result.$N = $T.values()[$N]", fName, tm, tmp);
+                            mb.endControlFlow();
+                            break;
+                        default:
+                            System.out.println("ERROR enum mapping for " + fName + " and type " + tm.toString());
+                    }
                 } else {
 
                     switch (tm.toString()) {
-                        case "java.lang.String":
+                        case Types.STRING:
                             mb.addStatement("result.$N = $N.getString($S)", fName, row, fName);
                             break;
-                        case "java.lang.Long":
+                        case Types.LONG:
                             mb.addStatement("result.$N = $N.getLong($S)", fName, row, fName);
                             break;
-                        case "java.lang.Integer":
+                        case Types.INTEGER:
                             mb.addStatement("result.$N = $N.getInteger($S)", fName, row, fName);
                             break;
-                        case "io.vertx.core.json.JsonObject":
+                        case Types.JSONOBJECT:
                             mb.addStatement("result.$N = $N.get($T.class, $N.getColumnIndex($S))", fName, row, JsonObject.class, row, fName);
                             break;
                         default:

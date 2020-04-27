@@ -14,6 +14,7 @@ import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.lorislab.vertx.sql.mapper.impl.SqlMapperProcessor;
 
 
 public class SqlMapperProcessorTest {

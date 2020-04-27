@@ -2,8 +2,6 @@ package org.lorislab.vertx.sql.mapper;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
-import io.vertx.sqlclient.RowIterator;
-import io.vertx.sqlclient.RowSet;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -59,52 +57,6 @@ public class SimpleMapperImpl implements SimpleMapper {
     }
 
     @Override
-    public Pojo map(RowSet<Row> rowSet) {
-        if (rowSet == null) {
-            return null;
-        }
-        RowIterator<Row> iterator = rowSet.iterator();
-        if (!iterator.hasNext()) {
-            return null;
-        }
-        return map(iterator.next());
-    }
-
-    @Override
-    public Pojo map(RowSet<Row> rowSet, String alias) {
-        if (rowSet == null) {
-            return null;
-        }
-        RowIterator<Row> iterator = rowSet.iterator();
-        if (!iterator.hasNext()) {
-            return null;
-        }
-        return map(iterator.next(), alias);
-    }
-
-    @Override
-    public Pojo map(RowIterator<Row> iterator) {
-        if (iterator == null) {
-            return null;
-        }
-        if (!iterator.hasNext()) {
-            return null;
-        }
-        return map(iterator.next());
-    }
-
-    @Override
-    public Pojo map(RowIterator<Row> iterator, String alias) {
-        if (iterator == null) {
-            return null;
-        }
-        if (!iterator.hasNext()) {
-            return null;
-        }
-        return map(iterator.next(), alias);
-    }
-
-    @Override
     public Pojo mapSqlMapping(Row row) {
         if (row == null) {
             return null;
@@ -148,22 +100,6 @@ public class SimpleMapperImpl implements SimpleMapper {
 
     public static Pojo mapS(Row row, String alias) {
         return INSTANCE.map(row, alias);
-    }
-
-    public static Pojo mapS(RowSet<Row> rowSet) {
-        return INSTANCE.map(rowSet);
-    }
-
-    public static Pojo mapS(RowSet<Row> rowSet, String alias) {
-        return INSTANCE.map(rowSet, alias);
-    }
-
-    public static Pojo mapS(RowIterator<Row> iterator) {
-        return INSTANCE.map(iterator);
-    }
-
-    public static Pojo mapS(RowIterator<Row> iterator, String alias) {
-        return INSTANCE.map(iterator, alias);
     }
 
     public static Pojo mapSqlMappingS(Row row) {

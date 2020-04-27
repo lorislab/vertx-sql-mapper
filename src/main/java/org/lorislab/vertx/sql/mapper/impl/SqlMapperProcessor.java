@@ -1,6 +1,9 @@
-package org.lorislab.vertx.sql.mapper;
+package org.lorislab.vertx.sql.mapper.impl;
 
 import com.google.auto.service.AutoService;
+import org.lorislab.vertx.sql.mapper.SqlMapper;
+import org.lorislab.vertx.sql.mapper.impl.ClassModel;
+import org.lorislab.vertx.sql.mapper.impl.SqlMapperImpClassWriter;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;

@@ -1,4 +1,4 @@
-package org.lorislab.vertx.sql.mapper;
+package org.lorislab.vertx.sql.mapper.impl;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
