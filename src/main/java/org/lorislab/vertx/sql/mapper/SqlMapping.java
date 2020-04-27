@@ -9,9 +9,11 @@ public @interface SqlMapping {
 
     String target();
 
-    String source() default "";
+    String column() default "";
 
     boolean ignore() default false;
 
     String alias() default "";
+
+    SqlEnumType enumType() default SqlEnumType.DEFAULT;
 }

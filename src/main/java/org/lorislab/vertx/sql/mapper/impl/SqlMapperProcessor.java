@@ -2,14 +2,14 @@ package org.lorislab.vertx.sql.mapper.impl;
 
 import com.google.auto.service.AutoService;
 import org.lorislab.vertx.sql.mapper.SqlMapper;
-import org.lorislab.vertx.sql.mapper.impl.ClassModel;
-import org.lorislab.vertx.sql.mapper.impl.SqlMapperImpClassWriter;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class SqlMapperProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         roundEnv.getElementsAnnotatedWith(SqlMapper.class).forEach(this::generateMetamodel);
         if (!roundEnv.processingOver() && round > MAX_ROUND) {
-            messager().printMessage(Diagnostic.Kind.ERROR, "possible processing loop detected (" + (MAX_ROUND+1)+ ")");
+            messager().printMessage(Diagnostic.Kind.ERROR, "SqlMapper possible processing loop detected (" + (MAX_ROUND+1)+ ")");
         }
         round++;
         return false;
@@ -35,15 +35,12 @@ public class SqlMapperProcessor extends AbstractProcessor {
 
     private void generateMetamodel(Element element) {
         TypeElement typeElement = (TypeElement) element;
-
-        messager().printMessage(Diagnostic.Kind.NOTE, "processing " + element);
-        final ClassModel classModel = new ClassModel(processingEnv);
-        typeElement.getEnclosedElements().stream()
-                .filter(e -> e.getKind() == ElementKind.METHOD)
-                .map(e -> (ExecutableElement) e)
-                .filter(e -> !e.isDefault())
-                .forEach(classModel::addMethod);
-        writeImplClass(typeElement, classModel);
+        if (element.getKind() == ElementKind.INTERFACE) {
+            messager().printMessage(Diagnostic.Kind.NOTE, "SqlMapper processing interface: " + element);
+            writeImplClass(typeElement);
+        } else {
+            messager().printMessage(Diagnostic.Kind.ERROR, "SqlMapper is not interface. The element: " + element + " kind: " + element.getKind() + " will be ignored.");
+        }
     }
 
     @Override
@@ -56,12 +53,12 @@ public class SqlMapperProcessor extends AbstractProcessor {
         return SourceVersion.RELEASE_8;
     }
 
-    private void writeImplClass(TypeElement element, ClassModel classModel) {
+    private void writeImplClass(TypeElement element) {
         try {
-            new SqlMapperImpClassWriter(element, classModel).invoke();
+            SqlMapperImpClassWriter.invoke(processingEnv, element);
         } catch (IOException e) {
             e.printStackTrace();
-            messager().printMessage(Diagnostic.Kind.ERROR, "Writing SQL mapper implementation class failed", element);
+            messager().printMessage(Diagnostic.Kind.ERROR, "Writing SqlMapper implementation class failed", element);
         }
     }
 
