@@ -2,8 +2,6 @@ package org.lorislab.vertx.sql.mapper.test;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
-import java.lang.Override;
-import java.lang.String;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.lorislab.vertx.sql.mapper.SqlEnumType;
@@ -20,22 +18,22 @@ public class SimpleMapperImpl implements SimpleMapper {
             return null;
         }
         Model result = new Model();
-        result.id = row.getString("id");
-        result.version = row.getInteger("version");
-        result.messageId = row.getString("messageId");
-        result.parent = row.getString("parent");
-        result.processId = row.getString("process");
-        result.processVersion = row.getString("processVersion");
-        String resultStatus = row.getString("status");
+        result.id = row.getString(Model_.ID);
+        result.version = row.getInteger(Model_.VERSION);
+        result.messageId = row.getString(Model_.MESSAGE_ID);
+        result.parent = row.getString(Model_.PARENT);
+        result.processId = row.getString(Model_.PROCESS_ID);
+        result.processVersion = row.getString(Model_.PROCESS_VERSION);
+        String resultStatus = row.getString(Model_.STATUS);
         if (resultStatus != null) {
             result.status = ModelStatus.valueOf(resultStatus);
         }
-        Integer resultStatusInteger = row.getInteger("statusInteger");
+        Integer resultStatusInteger = row.getInteger(Model_.STATUS_INTEGER);
         if (resultStatusInteger != null) {
             result.statusInteger = ModelStatus.values()[resultStatusInteger];
         }
-        result.data = row.get(JsonObject.class, row.getColumnIndex("data"));
-        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray("createdFrom")));
+        result.data = row.get(JsonObject.class, row.getColumnIndex(Model_.DATA));
+        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(Model_.CREATED_FROM)));
         return result;
     }
 
@@ -89,13 +87,13 @@ public class SimpleMapperImpl implements SimpleMapper {
         }
         Model result = new Model();
         result.id = row.getString("uid");
-        result.version = row.getInteger("version");
-        result.messageId = row.getString("messageId");
+        result.version = row.getInteger(Model_.VERSION);
+        result.messageId = row.getString(Model_.MESSAGE_ID);
         result.parent = row.getString("x.p");
-        result.processId = row.getString("process");
-        result.processVersion = row.getString("processVersion");
-        result.data = row.get(JsonObject.class, row.getColumnIndex("data"));
-        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray("createdFrom")));
+        result.processId = row.getString(Model_.PROCESS_ID);
+        result.processVersion = row.getString(Model_.PROCESS_VERSION);
+        result.data = row.get(JsonObject.class, row.getColumnIndex(Model_.DATA));
+        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(Model_.CREATED_FROM)));
         return result;
     }
 
