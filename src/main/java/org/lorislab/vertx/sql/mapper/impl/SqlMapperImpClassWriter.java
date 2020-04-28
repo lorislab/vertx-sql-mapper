@@ -142,112 +142,52 @@ public class SqlMapperImpClassWriter {
         }
     }
 
-    private static void addSetFieldMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, String column, boolean alias) {
-        switch (field.declaredType.getTypeArguments().get(0).toString()) {
+    private static String getMethodName(String type) {
+        switch (type) {
             case Types.STRING:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getStringArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getStringArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getStringArray($S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getStringArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
+                return "String";
             case Types.LONG:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getLongArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getLongArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getLongArray($S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getLongArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
+                return "Long";
             case Types.INTEGER:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getIntegerArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getIntegerArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getIntegerArray($S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = new $T<>($T.asList($N.getIntegerArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
+                return "Integer";
         }
-    }
-
-    private static void addSetListMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, String column, boolean alias) {
-        String itemType = field.declaredType.getTypeArguments().get(0).toString();
-        switch (field.declaredType.getTypeArguments().get(0).toString()) {
-            case Types.STRING:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T.asList($N.getStringArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = new $T.asList($N.getStringArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T.asList($N.getStringArray($S))", method.resultVar, field.name, Arrays.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = new $T.asList($N.getStringArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-            case Types.LONG:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T.asList($N.getLongArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = new $T.asList($N.getLongArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T.asList($N.getLongArray($S))", method.resultVar, field.name, Arrays.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = new $T.asList($N.getLongArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-            case Types.INTEGER:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T.asList($N.getIntegerArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = new $T.asList($N.getIntegerArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = new $T.asList($N.getIntegerArray($S))", method.resultVar, field.name, Arrays.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = new $T.asList($N.getIntegerArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-        }
+        return null;
     }
 
     private static void addInterfaceFieldMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, String column, boolean alias) {
+        String methodName = getMethodName(field.declaredType.getTypeArguments().get(0).toString());
+        if (methodName == null) {
+            System.out.println("Not supported " + field.name + " type " + field.declaredType.getTypeArguments().get(0));
+            return;
+        }
         if (Types.SET.equals(field.qualifiedName)) {
-            addSetFieldMapping(mb, method, field, column, alias);
+            if (column == null) {
+                if (!alias) {
+                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, method.returnModel.metamodel, field.constName);
+                } else {
+                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, method.aliasVar, field.column);
+                }
+            } else {
+                if (!alias) {
+                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, column);
+                } else {
+                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, method.aliasVar, column);
+                }
+            }
         } else if (Types.LIST.equals(field.qualifiedName)) {
-            addSetListMapping(mb, method, field, column, alias);
+            if (column == null) {
+                if (!alias) {
+                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, methodName, method.returnModel.metamodel, field.constName);
+                } else {
+                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, methodName, method.aliasVar, field.column);
+                }
+            } else {
+                if (!alias) {
+                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($S))", method.resultVar, field.name, Arrays.class, method.row, methodName, column);
+                } else {
+                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, methodName, method.aliasVar, column);
+                }
+            }
         } else {
             System.out.println("Not supported " + field.name + " type " + field.qualifiedName);
         }
