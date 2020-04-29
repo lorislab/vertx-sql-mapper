@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 lorislab.org.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.lorislab.vertx.sql.mapper.impl;
 
 import com.squareup.javapoet.*;
@@ -8,6 +23,7 @@ import org.lorislab.vertx.sql.mapper.SqlMapper;
 import org.lorislab.vertx.sql.mapper.SqlMapping;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,12 +31,13 @@ import java.util.HashSet;
 
 public class SqlMapperImpClassWriter {
 
-    private SqlMapperImpClassWriter() {}
+    private SqlMapperImpClassWriter() {
+    }
 
-    private static void addEnumFieldMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, String column, boolean alias, SqlEnumType enumType) {
+    private static void addEnum(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
 
         // check the field annotation for default method mapping
-        SqlEnumType type = enumType;
+        SqlEnumType type = mapping.enumType;
         if (type == SqlEnumType.DEFAULT) {
             SqlEnum me = field.element.getAnnotation(SqlEnum.class);
             if (me != null) {
@@ -31,206 +48,157 @@ public class SqlMapperImpClassWriter {
         if (type == SqlEnumType.DEFAULT) {
             type = SqlEnumType.STRING;
         }
+        FieldType ft = FieldType.STRING;
+        if (type == SqlEnumType.INTEGER) {
+            ft = FieldType.INTEGER;
+        }
 
         String tmp = method.resultVar + field.name.substring(0, 1).toUpperCase() + field.name.substring(1);
-        switch (type) {
-            case STRING:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("String $N = $N.getString($N.$N)", tmp, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("String $N = $N.getString($N + $S)", tmp, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("String $N = $N.getString($S)", tmp, method.row, column);
-                    } else {
-                        mb.addStatement("String $N = $N.getString($N + $S)", tmp, method.row, method.aliasVar, column);
-                    }
-                }
-                mb.beginControlFlow("if ($N != null)", tmp);
-                mb.addStatement("$N.$N = $T.valueOf($N)", method.resultVar, field.name, field.element, tmp);
-                mb.endControlFlow();
-                break;
-            case INTEGER:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("Integer $N = $N.getInteger($N.$N)", tmp, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("Integer $N = $N.getInteger($N + $S)", tmp, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("Integer $N = $N.getInteger($S)", tmp, method.row, column);
-                    } else {
-                        mb.addStatement("Integer $N = $N.getInteger($N + $S)", tmp, method.row, method.aliasVar, column);
-                    }
-                }
-                mb.beginControlFlow("if ($N != null)", tmp);
-                mb.addStatement("$N.$N = $T.values()[$N]", method.resultVar, field.name, field.element, tmp);
-                mb.endControlFlow();
-                break;
-            default:
-                System.out.println("ERROR enum mapping for " + field.name + " and type " + field.element);
-        }
-    }
-
-    private static void addClassFieldMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, String column, boolean alias) {
-        switch (field.qualifiedName) {
-            case Types.STRING:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.getString($N.$N)", method.resultVar, field.name, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = $N.getString($N + $S)", method.resultVar, field.name, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.getString($S)", method.resultVar, field.name, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = $N.getString($N + $S)", method.resultVar, field.name, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-            case Types.LONG:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.getLong($N.$N)", method.resultVar, field.name, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = $N.getLong($N + $S)", method.resultVar, field.name, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.getLong($S)", method.resultVar, field.name, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = $N.getLong($N + $S)", method.resultVar, field.name, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-            case Types.INTEGER:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.getInteger($N.$N)", method.resultVar, field.name, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = $N.getInteger($N + $S)", method.resultVar, field.name, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.getInteger($S)", method.resultVar, field.name, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = $N.getInteger($N + $S)", method.resultVar, field.name, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-            case Types.JSON_OBJECT:
-                if (column == null) {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N.$N))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.returnModel.metamodel, field.constName);
-                    } else {
-                        mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.aliasVar, field.column);
-                    }
-                } else {
-                    if (!alias) {
-                        mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, column);
-                    } else {
-                        mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.aliasVar, column);
-                    }
-                }
-                break;
-            default:
-                System.out.println("FIELD " + field.element.getKind() + " type " + field.element.asType() + " name " + field.name);
-        }
-    }
-
-    private static String getMethodName(String type) {
-        switch (type) {
-            case Types.STRING:
-                return "String";
-            case Types.LONG:
-                return "Long";
-            case Types.INTEGER:
-                return "Integer";
-        }
-        return null;
-    }
-
-    private static void addInterfaceFieldMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, String column, boolean alias) {
-        String methodName = getMethodName(field.declaredType.getTypeArguments().get(0).toString());
-        if (methodName == null) {
-            System.out.println("Not supported " + field.name + " type " + field.declaredType.getTypeArguments().get(0));
-            return;
-        }
-        if (Types.SET.equals(field.qualifiedName)) {
-            if (column == null) {
-                if (!alias) {
-                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, method.returnModel.metamodel, field.constName);
-                } else {
-                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, method.aliasVar, field.column);
-                }
+        if (mapping.column == null) {
+            if (!mapping.alias) {
+                mb.addStatement("$N $N = $N.get$N($N.$N)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.returnModel.metamodel, field.constName);
             } else {
-                if (!alias) {
-                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, column);
-                } else {
-                    mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, methodName, method.aliasVar, column);
-                }
-            }
-        } else if (Types.LIST.equals(field.qualifiedName)) {
-            if (column == null) {
-                if (!alias) {
-                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, methodName, method.returnModel.metamodel, field.constName);
-                } else {
-                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, methodName, method.aliasVar, field.column);
-                }
-            } else {
-                if (!alias) {
-                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($S))", method.resultVar, field.name, Arrays.class, method.row, methodName, column);
-                } else {
-                    mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, methodName, method.aliasVar, column);
-                }
+                mb.addStatement("$N $N = $N.get$N($N + $S)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.aliasVar, field.column);
             }
         } else {
-            System.out.println("Not supported " + field.name + " type " + field.qualifiedName);
+            if (!mapping.alias) {
+                mb.addStatement("$N $N = $N.get$N($S)", ft.rowMethod, tmp, method.row, ft.rowMethod, mapping.column);
+            } else {
+                mb.addStatement("$N $N = $N.get$N($N + $S)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.aliasVar, mapping.column);
+            }
+        }
+        mb.beginControlFlow("if ($N != null)", tmp);
+        if (type == SqlEnumType.INTEGER) {
+            mb.addStatement("$N.$N = $T.values()[$N]", method.resultVar, field.name, field.element, tmp);
+        } else {
+            mb.addStatement("$N.$N = $T.valueOf($N)", method.resultVar, field.name, field.element, tmp);
+        }
+        mb.endControlFlow();
+    }
+
+    private static void addClass(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, FieldType type, MergeMapping mapping) {
+        if (mapping.column == null) {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = $N.get$N($N.$N)", method.resultVar, field.name, method.row, type.rowMethod, method.returnModel.metamodel, field.constName);
+            } else {
+                mb.addStatement("$N.$N = $N.get$N($N + $S)", method.resultVar, field.name, method.row, type.rowMethod, method.aliasVar, field.column);
+            }
+        } else {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = $N.get$N($S)", method.resultVar, field.name, method.row, type.rowMethod, mapping.column);
+            } else {
+                mb.addStatement("$N.$N = $N.get$N($N + $S)", method.resultVar, field.name, method.row, type.rowMethod, method.aliasVar, mapping.column);
+            }
         }
     }
 
-    private static void addFieldMapping(MethodSpec.Builder mb, MethodInfo method, FieldInfo field) {
+    private static void addJsonObject(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
+        if (mapping.column == null) {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N.$N))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.returnModel.metamodel, field.constName);
+            } else {
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.aliasVar, field.column);
+            }
+        } else {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, mapping.column);
+            } else {
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.aliasVar, mapping.column);
+            }
+        }
+    }
 
+    private static void addList(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, FieldType type, MergeMapping mapping) {
+        if (mapping.column == null) {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, method.returnModel.metamodel, field.constName);
+            } else {
+                mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, method.aliasVar, field.column);
+            }
+        } else {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = new $T.asList($N.get$NArray($S))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, mapping.column);
+            } else {
+                mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, method.aliasVar, mapping.column);
+            }
+        }
+    }
+
+    private static void addSet(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, FieldType type, MergeMapping mapping) {
+        if (mapping.column == null) {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, method.returnModel.metamodel, field.constName);
+            } else {
+                mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, method.aliasVar, field.column);
+            }
+        } else {
+            if (!mapping.alias) {
+                mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, mapping.column);
+            } else {
+                mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, method.aliasVar, mapping.column);
+            }
+        }
+    }
+
+    private static class MergeMapping {
+        boolean alias = false;
         String column = null;
-        boolean alias = method.alias != null;
+        boolean ignore = false;
         SqlEnumType enumType = SqlEnumType.DEFAULT;
+    }
 
-        // apply mapping from the method
+    private static MergeMapping merge(MethodInfo method, FieldInfo field) {
+        MergeMapping merge = new MergeMapping();
+        merge.alias = method.alias != null;
         SqlMapping mapping = method.mappings.get(field.name);
         if (mapping != null) {
             // ignore field
-            if (mapping.ignore()) {
-                return;
-            }
+            merge.ignore = mapping.ignore();
             // add column name
             if (!mapping.column().isBlank()) {
-                column = mapping.column();
+                merge.column = mapping.column();
             }
             // add alias to column
             if (!mapping.alias().isBlank()) {
-                if (column == null) {
-                    column = field.column;
+                if (merge.column == null) {
+                    merge.column = field.column;
                 }
-                column = mapping.alias() + "." + column;
+                merge.column = mapping.alias() + "." + merge.column;
                 // ignore global alias
-                alias = false;
+                merge.alias = false;
             }
-            enumType = mapping.enumType();
+            merge.enumType = mapping.enumType();
         }
+        return merge;
+    }
+    private static void addCollection(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping, FieldType type) {
+        String item = field.declaredType.getTypeArguments().get(0).toString();
+        FieldType itemType = FieldType.from(item);
+        if (itemType != null && itemType.isField()) {
+            if (FieldType.SET == type) {
+                addSet(mb, method, field, itemType, mapping);
+            } else if (FieldType.LIST == type) {
+                addList(mb, method, field, itemType, mapping);
+            }
+        }
+    }
 
-        switch (field.kind) {
-            case INTERFACE:
-                addInterfaceFieldMapping(mb, method, field, column, alias);
-                break;
-            case ENUM:
-                addEnumFieldMapping(mb, method, field, column, alias, enumType);
-                break;
-            default:
-                addClassFieldMapping(mb, method, field, column, alias);
+    private static void addField(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
+        if (field.kind == ElementKind.ENUM) {
+            addEnum(mb, method, field, mapping);
+        } else {
+            FieldType type = FieldType.from(field.qualifiedName);
+            if (type != null && type.isField()) {
+                if (type.isCollection()) {
+                    addCollection(mb, method, field, mapping, type);
+                } else {
+                    if (FieldType.JSON_OBJECT == type) {
+                        addJsonObject(mb, method, field, mapping);
+                    } else {
+                        addClass(mb, method, field, type, mapping);
+                    }
+                }
+            }
         }
     }
 
@@ -255,7 +223,10 @@ public class SqlMapperImpClassWriter {
         // add mapping of return type fields
         if (method.returnModel.fields != null) {
             for (FieldInfo field : method.returnModel.fields) {
-                addFieldMapping(mb, method, field);
+                MergeMapping mapping = merge(method, field);
+                if (!mapping.ignore) {
+                    addField(mb, method, field, mapping);
+                }
             }
         }
 
@@ -267,7 +238,7 @@ public class SqlMapperImpClassWriter {
     public static void createMapper(ProcessingEnvironment env, ClassInfo clazz) throws IOException {
 
         // create metamodels for the types
-        for (TypeInfo model: clazz.models.values()) {
+        for (TypeInfo model : clazz.models.values()) {
             SqlMapperMetamodelWriter.generateMetamodel(env, model);
         }
 
@@ -308,9 +279,9 @@ public class SqlMapperImpClassWriter {
         // add static instance
         classBuilder.addField(
                 FieldSpec.builder(type, clazz.mapper.instanceName())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                .initializer("new $N()", clazz.name)
-                .build()
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer("new $N()", clazz.name)
+                        .build()
         );
 
         return classBuilder;

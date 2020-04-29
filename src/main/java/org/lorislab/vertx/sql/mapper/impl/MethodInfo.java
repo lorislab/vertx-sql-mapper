@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 lorislab.org.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.lorislab.vertx.sql.mapper.impl;
 
 import org.lorislab.vertx.sql.mapper.SqlMapping;
@@ -14,23 +29,23 @@ import java.util.stream.Stream;
 
 public class MethodInfo {
 
-    public String name;
+    String name;
 
-    public TypeInfo returnModel;
+    TypeInfo returnModel;
 
-    public ExecutableElement element;
+    ExecutableElement element;
 
-    public int parameterSize;
+    int parameterSize;
 
-    public String row;
+    String row;
 
-    public String alias;
+    String alias;
 
-    public String aliasVar = "a";
+    String aliasVar = "a";
 
-    public Map<String, SqlMapping> mappings;
+    Map<String, SqlMapping> mappings;
 
-    public String resultVar = "result";
+    String resultVar = "result";
 
 
     public static MethodInfo build(ExecutableElement element, Map<String, TypeInfo> models) {
@@ -45,30 +60,11 @@ public class MethodInfo {
         method.parameterSize = element.getParameters().size();
         method.name = element.getSimpleName().toString();
 
-        // read 1 parameter
-        VariableElement p = element.getParameters().get(0);
-        String tmp = p.asType().toString();
-        if (Types.STRING.equals(tmp)) {
-            method.alias = p.getSimpleName().toString();
-        } else if (Types.ROWS.contains(tmp)) {
-            method.row = p.getSimpleName().toString();
-        } else {
-            throw new IllegalStateException("Wrong first type of the input parameter! Required type string or row! Method: " + method.name);
-        }
-
-        // read 2 parameter
+        // read parameters
+        readParameter(element, method, 0);
         if (method.parameterSize == 2) {
-            p = element.getParameters().get(1);
-            tmp = p.asType().toString();
-            if (Types.STRING.equals(tmp)) {
-                method.alias = p.getSimpleName().toString();
-            } else if (Types.ROWS.contains(tmp)) {
-                method.row = p.getSimpleName().toString();
-            } else {
-                throw new IllegalStateException("Wrong second type of the input parameter! Required type string or row! Method: " + method.name);
-            }
+            readParameter(element, method, 1);
         }
-
         // the row parameter is required
         if (method.parameterSize == 1 && method.row == null) {
             throw new IllegalStateException("Missing row input parameter! Method: " + method.name);
@@ -88,6 +84,18 @@ public class MethodInfo {
         method.mappings = Stream.of(am).collect(Collectors.toMap(SqlMapping::target, Function.identity()));
 
         return method;
+    }
+
+    private static void readParameter(ExecutableElement element, MethodInfo method, int index) {
+        VariableElement p = element.getParameters().get(index);
+        FieldType type = FieldType.from(p.asType().toString());
+        if (FieldType.STRING == type) {
+            method.alias = p.getSimpleName().toString();
+        } else if (type == FieldType.ROW_MUTINY || type == FieldType.ROW ) {
+            method.row = p.getSimpleName().toString();
+        } else {
+            throw new IllegalStateException("Wrong " + (index+1) + " type of the input parameter! Required type string or Row! Method: " + method.name);
+        }
     }
 
     private static TypeElement getTypeElement(TypeMirror type) {
