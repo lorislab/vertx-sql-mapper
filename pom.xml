@@ -10,8 +10,8 @@
     <name>vertx-sql-mapper</name>
     <packaging>jar</packaging>
 
-    <description>Mapstruct vertx SQL</description>
-    <url>https://gitlab.com/lorislab/vertx-sql-mapper</url>
+    <description>Vertx SQL mapper</description>
+    <url>https://github.com/lorislab/vertx-sql-mapper</url>
 
     <licenses>
         <license>
