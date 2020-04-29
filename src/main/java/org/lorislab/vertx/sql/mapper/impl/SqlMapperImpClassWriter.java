@@ -16,7 +16,6 @@
 package org.lorislab.vertx.sql.mapper.impl;
 
 import com.squareup.javapoet.*;
-import io.vertx.core.json.JsonObject;
 import org.lorislab.vertx.sql.mapper.SqlEnum;
 import org.lorislab.vertx.sql.mapper.SqlEnumType;
 import org.lorislab.vertx.sql.mapper.SqlMapper;
@@ -94,17 +93,18 @@ public class SqlMapperImpClassWriter {
     }
 
     private static void addJsonObject(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
+        ClassName jsonObject = ClassName.get("io.vertx.core.json", "JsonObject");
         if (mapping.column == null) {
             if (!mapping.alias) {
-                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N.$N))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.returnModel.metamodel, field.constName);
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N.$N))", method.resultVar, field.name, method.row, jsonObject, method.row, method.returnModel.metamodel, field.constName);
             } else {
-                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.aliasVar, field.column);
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, jsonObject, method.row, method.aliasVar, field.column);
             }
         } else {
             if (!mapping.alias) {
-                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, mapping.column);
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($S))", method.resultVar, field.name, method.row, jsonObject, method.row, mapping.column);
             } else {
-                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, JsonObject.class, method.row, method.aliasVar, mapping.column);
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, jsonObject, method.row, method.aliasVar, mapping.column);
             }
         }
     }
