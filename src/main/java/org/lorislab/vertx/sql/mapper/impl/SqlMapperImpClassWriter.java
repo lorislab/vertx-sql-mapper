@@ -25,6 +25,7 @@ import org.lorislab.vertx.sql.mapper.SqlMapping;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -171,7 +172,7 @@ public class SqlMapperImpClassWriter {
         }
         return merge;
     }
-    private static void addCollection(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping, FieldType type) {
+    private static void addCollection(ProcessingEnvironment env, MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping, FieldType type) {
         String item = field.declaredType.getTypeArguments().get(0).toString();
         FieldType itemType = FieldType.from(item);
         if (itemType != null && itemType.isField()) {
@@ -180,17 +181,19 @@ public class SqlMapperImpClassWriter {
             } else if (FieldType.LIST == type) {
                 addList(mb, method, field, itemType, mapping);
             }
+        } else {
+            env.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not supported collection item type " + item + " for the field " + field.name, field.element);
         }
     }
 
-    private static void addField(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
+    private static void addField(ProcessingEnvironment env, MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
         if (field.kind == ElementKind.ENUM) {
             addEnum(mb, method, field, mapping);
         } else {
             FieldType type = FieldType.from(field.qualifiedName);
             if (type != null && type.isField()) {
                 if (type.isCollection()) {
-                    addCollection(mb, method, field, mapping, type);
+                    addCollection(env, mb, method, field, mapping, type);
                 } else {
                     if (FieldType.JSON_OBJECT == type) {
                         addJsonObject(mb, method, field, mapping);
@@ -198,11 +201,13 @@ public class SqlMapperImpClassWriter {
                         addClass(mb, method, field, type, mapping);
                     }
                 }
+            } else {
+                env.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not supported type " + field.qualifiedName + " for the field " + field.name, field.element);
             }
         }
     }
 
-    private static MethodSpec createMethod(MethodInfo method) {
+    private static MethodSpec createMethod(ProcessingEnvironment env, MethodInfo method) {
 
         // create method
         MethodSpec.Builder mb = MethodSpec.overriding(method.element)
@@ -225,7 +230,7 @@ public class SqlMapperImpClassWriter {
             for (FieldInfo field : method.returnModel.fields) {
                 MergeMapping mapping = merge(method, field);
                 if (!mapping.ignore) {
-                    addField(mb, method, field, mapping);
+                    addField(env, mb, method, field, mapping);
                 }
             }
         }
@@ -247,7 +252,7 @@ public class SqlMapperImpClassWriter {
 
         // create methods
         for (MethodInfo item : clazz.methods) {
-            MethodSpec method = createMethod(item);
+            MethodSpec method = createMethod(env, item);
             classBuilder.addMethod(method);
             // create static method
             if (clazz.mapper.staticMethod()) {

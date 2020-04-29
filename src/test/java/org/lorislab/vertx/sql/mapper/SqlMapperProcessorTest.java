@@ -30,9 +30,7 @@ import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.lorislab.vertx.sql.mapper.impl.SqlMapperProcessor;
-import org.lorislab.vertx.sql.mapper.test.Model_;
-import org.lorislab.vertx.sql.mapper.test.SimpleMapper;
-import org.lorislab.vertx.sql.mapper.test.SimpleMapperImpl;
+import org.lorislab.vertx.sql.mapper.test.*;
 
 
 public class SqlMapperProcessorTest {
@@ -58,6 +56,21 @@ public class SqlMapperProcessorTest {
             assertAbout(compilations()).that(compilation)
                     .generatedSourceFile("org/lorislab/vertx/sql/mapper/test/Model_")
                     .hasSourceEquivalentTo(source(Model_.class));
+            assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void generateAbstractClassSqlMapper() {
+        try {
+            Compilation compilation = compiler.compile(source(SimpleClassMapper.class));
+
+            assertAbout(compilations()).that(compilation)
+                    .generatedSourceFile("org/lorislab/vertx/sql/mapper/test/SimpleClassMapperImpl")
+                    .hasSourceEquivalentTo(source(SimpleClassMapperImpl.class));
             assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
 
         } catch (Exception e) {

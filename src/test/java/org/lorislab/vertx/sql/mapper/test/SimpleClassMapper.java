@@ -13,8 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.vertx.sql.mapper;
+package org.lorislab.vertx.sql.mapper.test;
+
+import io.vertx.sqlclient.Row;
+import org.lorislab.vertx.sql.mapper.SqlEnumType;
+import org.lorislab.vertx.sql.mapper.SqlMapper;
+import org.lorislab.vertx.sql.mapper.SqlMapping;
 
 @SqlMapper
-public class SimpleAbstractClassMapper {
+public abstract class SimpleClassMapper {
+
+    public abstract Model map(Row row);
+
+    public void test() {
+
+    }
+
 }
