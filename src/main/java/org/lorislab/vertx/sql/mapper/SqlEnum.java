@@ -20,10 +20,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Define mapping for the enumeration type. Default is {@code STRING}.
+ */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.FIELD)
 public @interface SqlEnum {
 
+    /**
+     * Define the enumeration mapping for mapper from {@code String} or {@code Integer} database value.
+     * @return the enumeration mapping for the mapper.
+     */
     SqlEnumType value() default SqlEnumType.STRING;
 
 }

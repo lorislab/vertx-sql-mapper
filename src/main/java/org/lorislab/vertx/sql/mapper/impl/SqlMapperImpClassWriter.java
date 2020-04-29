@@ -58,7 +58,7 @@ public class SqlMapperImpClassWriter {
             if (!mapping.alias) {
                 mb.addStatement("$N $N = $N.get$N($N.$N)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.returnModel.metamodel, field.constName);
             } else {
-                mb.addStatement("$N $N = $N.get$N($N + $S)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.aliasVar, field.column);
+                mb.addStatement("$N $N = $N.get$N($N + $N.$N)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.aliasVar, method.returnModel.metamodel, field.constName);
             }
         } else {
             if (!mapping.alias) {
@@ -81,7 +81,7 @@ public class SqlMapperImpClassWriter {
             if (!mapping.alias) {
                 mb.addStatement("$N.$N = $N.get$N($N.$N)", method.resultVar, field.name, method.row, type.rowMethod, method.returnModel.metamodel, field.constName);
             } else {
-                mb.addStatement("$N.$N = $N.get$N($N + $S)", method.resultVar, field.name, method.row, type.rowMethod, method.aliasVar, field.column);
+                mb.addStatement("$N.$N = $N.get$N($N + $N.$N)", method.resultVar, field.name, method.row, type.rowMethod, method.aliasVar, method.returnModel.metamodel, field.constName);
             }
         } else {
             if (!mapping.alias) {
@@ -98,7 +98,7 @@ public class SqlMapperImpClassWriter {
             if (!mapping.alias) {
                 mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N.$N))", method.resultVar, field.name, method.row, jsonObject, method.row, method.returnModel.metamodel, field.constName);
             } else {
-                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $S))", method.resultVar, field.name, method.row, jsonObject, method.row, method.aliasVar, field.column);
+                mb.addStatement("$N.$N = $N.get($T.class, $N.getColumnIndex($N + $N.$N))", method.resultVar, field.name, method.row, jsonObject, method.row, method.aliasVar, method.returnModel.metamodel, field.constName);
             }
         } else {
             if (!mapping.alias) {
@@ -114,7 +114,7 @@ public class SqlMapperImpClassWriter {
             if (!mapping.alias) {
                 mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N.$N))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, method.returnModel.metamodel, field.constName);
             } else {
-                mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $S))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, method.aliasVar, field.column);
+                mb.addStatement("$N.$N = new $T.asList($N.get$NArray($N + $N.$N))", method.resultVar, field.name, Arrays.class, method.row, type.rowMethod, method.aliasVar, method.returnModel.metamodel, field.constName);
             }
         } else {
             if (!mapping.alias) {
@@ -130,7 +130,7 @@ public class SqlMapperImpClassWriter {
             if (!mapping.alias) {
                 mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, method.returnModel.metamodel, field.constName);
             } else {
-                mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $S)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, method.aliasVar, field.column);
+                mb.addStatement("$N.$N = new $T<>($T.asList($N.get$NArray($N + $N.$N)))", method.resultVar, field.name, HashSet.class, Arrays.class, method.row, type.rowMethod, method.aliasVar, method.returnModel.metamodel, field.constName);
             }
         } else {
             if (!mapping.alias) {

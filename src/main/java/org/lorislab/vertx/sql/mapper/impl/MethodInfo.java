@@ -81,7 +81,7 @@ public class MethodInfo {
         }
 
         SqlMapping[] am = element.getAnnotationsByType(SqlMapping.class);
-        method.mappings = Stream.of(am).collect(Collectors.toMap(SqlMapping::target, Function.identity()));
+        method.mappings = Stream.of(am).collect(Collectors.toMap(SqlMapping::field, Function.identity()));
 
         return method;
     }

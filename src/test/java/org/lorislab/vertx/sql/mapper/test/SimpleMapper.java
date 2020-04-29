@@ -27,15 +27,15 @@ public interface SimpleMapper {
 
     Model map(Row row, String alias);
 
-    @SqlMapping(target = "id", column = "uid")
-    @SqlMapping(target = "status", ignore = true)
-    @SqlMapping(target = "statusInteger", ignore = true)
-    @SqlMapping(target = "parent", column = "p", alias = "x")
+    @SqlMapping(field = "id", column = "uid")
+    @SqlMapping(field = "status", ignore = true)
+    @SqlMapping(field = "statusInteger", ignore = true)
+    @SqlMapping(field = "parent", column = "p", alias = "x")
     Model mapSqlMapping(Row row);
 
-    @SqlMapping(target = "id", column = "uid")
-    @SqlMapping(target = "status", ignore = true)
-    @SqlMapping(target = "statusInteger", enumType = SqlEnumType.STRING)
-    @SqlMapping(target = "parent", column = "p", alias = "x")
+    @SqlMapping(field = "id", column = "uid")
+    @SqlMapping(field = "status", ignore = true)
+    @SqlMapping(field = "statusInteger", enumType = SqlEnumType.STRING)
+    @SqlMapping(field = "parent", column = "p", alias = "x")
     Model mapSqlMapping(Row row, String alias);
 }

@@ -1,18 +1,3 @@
-/*
- * Copyright 2020 lorislab.org.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.lorislab.vertx.sql.mapper.test;
 
 import io.vertx.core.json.JsonObject;
@@ -49,6 +34,7 @@ public class SimpleMapperImpl implements SimpleMapper {
         }
         result.data = row.get(JsonObject.class, row.getColumnIndex(Model_.DATA));
         result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(Model_.CREATED_FROM)));
+        result.time = row.getLocalTime(Model_.TIME);
         return result;
     }
 
@@ -66,22 +52,23 @@ public class SimpleMapperImpl implements SimpleMapper {
             a = alias + ".";
         }
         Model result = new Model();
-        result.id = row.getString(a + "id");
-        result.version = row.getInteger(a + "version");
-        result.messageId = row.getString(a + "messageId");
-        result.parent = row.getString(a + "parent");
-        result.processId = row.getString(a + "process");
-        result.processVersion = row.getString(a + "processVersion");
-        String resultStatus = row.getString(a + "status");
+        result.id = row.getString(a + Model_.ID);
+        result.version = row.getInteger(a + Model_.VERSION);
+        result.messageId = row.getString(a + Model_.MESSAGE_ID);
+        result.parent = row.getString(a + Model_.PARENT);
+        result.processId = row.getString(a + Model_.PROCESS_ID);
+        result.processVersion = row.getString(a + Model_.PROCESS_VERSION);
+        String resultStatus = row.getString(a + Model_.STATUS);
         if (resultStatus != null) {
             result.status = ModelStatus.valueOf(resultStatus);
         }
-        Integer resultStatusInteger = row.getInteger(a + "statusInteger");
+        Integer resultStatusInteger = row.getInteger(a + Model_.STATUS_INTEGER);
         if (resultStatusInteger != null) {
             result.statusInteger = ModelStatus.values()[resultStatusInteger];
         }
-        result.data = row.get(JsonObject.class, row.getColumnIndex(a + "data"));
-        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(a + "createdFrom")));
+        result.data = row.get(JsonObject.class, row.getColumnIndex(a + Model_.DATA));
+        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(a + Model_.CREATED_FROM)));
+        result.time = row.getLocalTime(a + Model_.TIME);
         return result;
     }
 
@@ -91,10 +78,10 @@ public class SimpleMapperImpl implements SimpleMapper {
 
     @Override
     @SqlMappings({
-            @SqlMapping(target = "id", column = "uid"),
-            @SqlMapping(target = "status", ignore = true),
-            @SqlMapping(target = "statusInteger", ignore = true),
-            @SqlMapping(target = "parent", column = "p", alias = "x")
+            @SqlMapping(field = "id", column = "uid"),
+            @SqlMapping(field = "status", ignore = true),
+            @SqlMapping(field = "statusInteger", ignore = true),
+            @SqlMapping(field = "parent", column = "p", alias = "x")
     })
     public Model mapSqlMapping(Row row) {
         if (row == null) {
@@ -109,6 +96,7 @@ public class SimpleMapperImpl implements SimpleMapper {
         result.processVersion = row.getString(Model_.PROCESS_VERSION);
         result.data = row.get(JsonObject.class, row.getColumnIndex(Model_.DATA));
         result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(Model_.CREATED_FROM)));
+        result.time = row.getLocalTime(Model_.TIME);
         return result;
     }
 
@@ -118,10 +106,10 @@ public class SimpleMapperImpl implements SimpleMapper {
 
     @Override
     @SqlMappings({
-            @SqlMapping(target = "id", column = "uid"),
-            @SqlMapping(target = "status", ignore = true),
-            @SqlMapping(target = "statusInteger", enumType = SqlEnumType.STRING),
-            @SqlMapping(target = "parent", column = "p", alias = "x")
+            @SqlMapping(field = "id", column = "uid"),
+            @SqlMapping(field = "status", ignore = true),
+            @SqlMapping(field = "statusInteger", enumType = SqlEnumType.STRING),
+            @SqlMapping(field = "parent", column = "p", alias = "x")
     })
     public Model mapSqlMapping(Row row, String alias) {
         if (row == null) {
@@ -133,17 +121,18 @@ public class SimpleMapperImpl implements SimpleMapper {
         }
         Model result = new Model();
         result.id = row.getString(a + "uid");
-        result.version = row.getInteger(a + "version");
-        result.messageId = row.getString(a + "messageId");
+        result.version = row.getInteger(a + Model_.VERSION);
+        result.messageId = row.getString(a + Model_.MESSAGE_ID);
         result.parent = row.getString("x.p");
-        result.processId = row.getString(a + "process");
-        result.processVersion = row.getString(a + "processVersion");
-        String resultStatusInteger = row.getString(a + "statusInteger");
+        result.processId = row.getString(a + Model_.PROCESS_ID);
+        result.processVersion = row.getString(a + Model_.PROCESS_VERSION);
+        String resultStatusInteger = row.getString(a + Model_.STATUS_INTEGER);
         if (resultStatusInteger != null) {
             result.statusInteger = ModelStatus.valueOf(resultStatusInteger);
         }
-        result.data = row.get(JsonObject.class, row.getColumnIndex(a + "data"));
-        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(a + "createdFrom")));
+        result.data = row.get(JsonObject.class, row.getColumnIndex(a + Model_.DATA));
+        result.createdFrom = new HashSet<>(Arrays.asList(row.getLongArray(a + Model_.CREATED_FROM)));
+        result.time = row.getLocalTime(a + Model_.TIME);
         return result;
     }
 

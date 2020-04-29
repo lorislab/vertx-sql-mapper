@@ -20,6 +20,7 @@ import org.lorislab.vertx.sql.mapper.SqlColumn;
 import org.lorislab.vertx.sql.mapper.SqlEnum;
 import org.lorislab.vertx.sql.mapper.SqlEnumType;
 
+import java.time.LocalTime;
 import java.util.Set;
 
 public class Model {
@@ -46,4 +47,5 @@ public class Model {
 
     public Set<Long> createdFrom;
 
+    public LocalTime time;
 }

@@ -20,18 +20,37 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * SQL mapper annotation.
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.CLASS)
 public @interface SqlMapper {
 
     String CLASS = "org.lorislab.vertx.sql.mapper.SqlMapper";
 
+    /**
+     * Define the suffix of the mapper implementation class.
+     * @return the suffix of the mapper implementation class.
+     */
     String suffix() default "Impl";
 
+    /**
+     * Define the suffix of the static method.
+     * @return the suffix of the static method.
+     */
     String staticMethodSuffix() default "S";
 
+    /**
+     * Disable or enabled static method generator.
+     * @return the flag to disable or enable static method.
+     */
     boolean staticMethod() default true;
 
+    /**
+     * Define the static field name of the mapper.
+     * @return the static field name.
+     */
     String instanceName() default "INSTANCE";
 
 }

@@ -17,18 +17,41 @@ package org.lorislab.vertx.sql.mapper;
 
 import java.lang.annotation.*;
 
+/**
+ * SQL mapping optional configuration.
+ */
 @Repeatable(SqlMappings.class)
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
 public @interface SqlMapping {
 
-    String target();
+    /**
+     * The field name.
+     * @return the field name.
+     */
+    String field();
 
+    /**
+     * The column name. Default is field or {@code SqlColumn} value.
+     * @return the column name.
+     */
     String column() default "";
 
+    /**
+     * Ignore field for the mapping
+     * @return ignore field flag.
+     */
     boolean ignore() default false;
 
+    /**
+     * The alias for the field.
+     * @return alias for the mapping of the field.
+     */
     String alias() default "";
 
+    /**
+     * Only for enumeration. Define the enumeration mapping type.
+     * @return the enumeration mapping type.
+     */
     SqlEnumType enumType() default SqlEnumType.DEFAULT;
 }

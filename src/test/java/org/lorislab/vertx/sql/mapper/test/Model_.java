@@ -36,4 +36,6 @@ public interface Model_ {
     String DATA = "data";
 
     String CREATED_FROM = "createdFrom";
+
+    String TIME = "time";
 }

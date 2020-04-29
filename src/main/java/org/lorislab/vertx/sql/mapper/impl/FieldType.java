@@ -15,10 +15,37 @@
  */
 package org.lorislab.vertx.sql.mapper.impl;
 
+import java.math.BigDecimal;
+import java.time.*;
+import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Set;
 
 public enum FieldType {
+
+    SHORT(Short.class),
+
+    FLOAT(Float.class),
+
+    DOUBLE(Double.class),
+
+    TEMPORAL(Temporal.class),
+
+    LOCAL_DATE(LocalDate.class),
+
+    LOCAL_TIME(LocalTime.class),
+
+    LOCAL_DATE_TIME(LocalDateTime.class),
+
+    OFFSET_TIME(OffsetTime.class),
+
+    OFFSET_DATE_TIME(OffsetDateTime.class),
+
+    BUFFER("io.vertx.core.buffer.Buffer", "Buffer", false, true),
+
+    UUID(java.util.UUID.class),
+
+    BIG_DECIMAL(BigDecimal.class),
 
     LIST(List.class.getName(), null, true, true),
 

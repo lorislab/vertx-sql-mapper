@@ -20,10 +20,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Define new column name for the mapper.
+ */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.FIELD)
 public @interface SqlColumn {
 
+    /**
+     * Column name. The field name is the default value.
+     * @return the new column name for the mapper.
+     */
     String value() default "";
 
 }

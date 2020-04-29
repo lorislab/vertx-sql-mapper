@@ -15,11 +15,21 @@
  */
 package org.lorislab.vertx.sql.mapper;
 
+/**
+ * Enumeration mapping types.
+ */
 public enum SqlEnumType {
 
+    /**
+     * The default is equal to STRING.
+     */
     DEFAULT,
-
+    /**
+     * Mapping from string column to enumeration type.
+     */
     STRING,
-
+    /**
+     * Mapping from integer column to enumeration type.
+     */
     INTEGER;
 }
