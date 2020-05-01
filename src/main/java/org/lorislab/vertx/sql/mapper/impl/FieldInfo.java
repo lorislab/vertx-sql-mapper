@@ -46,6 +46,11 @@ public class FieldInfo {
         if (element == null) {
             return null;
         }
+        SqlColumn ac = element.getAnnotation(SqlColumn.class);
+        // ignore field
+        if (ac != null && ac.ignore()) {
+            return null;
+        }
         FieldInfo field = new FieldInfo();
         field.element = element;
         field.name = element.getSimpleName().toString();
@@ -57,7 +62,6 @@ public class FieldInfo {
         field.kind = typeElement.getKind();
         field.qualifiedName = typeElement.getQualifiedName().toString();
 
-        SqlColumn ac = element.getAnnotation(SqlColumn.class);
         if (ac != null && !ac.value().isBlank()) {
             field.column = ac.value();
         }

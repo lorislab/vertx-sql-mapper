@@ -48,4 +48,7 @@ public class Model {
     public Set<Long> createdFrom;
 
     public LocalTime time;
+
+    @SqlColumn(ignore = true)
+    public String ignore;
 }

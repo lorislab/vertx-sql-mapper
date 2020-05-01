@@ -33,4 +33,9 @@ public @interface SqlColumn {
      */
     String value() default "";
 
+    /**
+     * Ignore field for the mapping
+     * @return ignore field flag.
+     */
+    boolean ignore() default false;
 }
