@@ -38,4 +38,10 @@ public @interface SqlColumn {
      * @return ignore field flag.
      */
     boolean ignore() default false;
+
+    /**
+     * Only for enumeration. Define the enumeration mapping type.
+     * @return the enumeration mapping type.
+     */
+    SqlEnumType enumType() default SqlEnumType.DEFAULT;
 }

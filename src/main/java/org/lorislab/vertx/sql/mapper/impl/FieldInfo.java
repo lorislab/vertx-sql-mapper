@@ -16,6 +16,7 @@
 package org.lorislab.vertx.sql.mapper.impl;
 
 import org.lorislab.vertx.sql.mapper.SqlColumn;
+import org.lorislab.vertx.sql.mapper.SqlEnumType;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -42,13 +43,15 @@ public class FieldInfo {
 
     DeclaredType declaredType;
 
+    SqlEnumType enumType;
+
     public static FieldInfo build(Element element) {
         if (element == null) {
             return null;
         }
-        SqlColumn ac = element.getAnnotation(SqlColumn.class);
+        SqlColumn sqlColumn = element.getAnnotation(SqlColumn.class);
         // ignore field
-        if (ac != null && ac.ignore()) {
+        if (sqlColumn != null && sqlColumn.ignore()) {
             return null;
         }
         FieldInfo field = new FieldInfo();
@@ -61,9 +64,13 @@ public class FieldInfo {
         TypeElement typeElement = (TypeElement) field.declaredType.asElement();
         field.kind = typeElement.getKind();
         field.qualifiedName = typeElement.getQualifiedName().toString();
+        field.enumType = SqlEnumType.DEFAULT;
 
-        if (ac != null && !ac.value().isBlank()) {
-            field.column = ac.value();
+        if (sqlColumn != null) {
+            if (!sqlColumn.value().isBlank()) {
+                field.column = sqlColumn.value();
+            }
+            field.enumType = sqlColumn.enumType();
         }
 
         field.constName = field.name

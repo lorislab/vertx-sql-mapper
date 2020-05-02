@@ -16,7 +16,6 @@
 package org.lorislab.vertx.sql.mapper.impl;
 
 import com.squareup.javapoet.*;
-import org.lorislab.vertx.sql.mapper.SqlEnum;
 import org.lorislab.vertx.sql.mapper.SqlEnumType;
 import org.lorislab.vertx.sql.mapper.SqlMapper;
 import org.lorislab.vertx.sql.mapper.SqlMapping;
@@ -37,19 +36,8 @@ public class SqlMapperImpClassWriter {
     private static void addEnum(MethodSpec.Builder mb, MethodInfo method, FieldInfo field, MergeMapping mapping) {
 
         // check the field annotation for default method mapping
-        SqlEnumType type = mapping.enumType;
-        if (type == SqlEnumType.DEFAULT) {
-            SqlEnum me = field.element.getAnnotation(SqlEnum.class);
-            if (me != null) {
-                type = me.value();
-            }
-        }
-        // set default
-        if (type == SqlEnumType.DEFAULT) {
-            type = SqlEnumType.STRING;
-        }
         FieldType ft = FieldType.STRING;
-        if (type == SqlEnumType.INTEGER) {
+        if (mapping.enumType == SqlEnumType.INTEGER) {
             ft = FieldType.INTEGER;
         }
 
@@ -68,7 +56,7 @@ public class SqlMapperImpClassWriter {
             }
         }
         mb.beginControlFlow("if ($N != null)", tmp);
-        if (type == SqlEnumType.INTEGER) {
+        if (ft == FieldType.INTEGER) {
             mb.addStatement("$N.$N = $T.values()[$N]", method.resultVar, field.name, field.element, tmp);
         } else {
             mb.addStatement("$N.$N = $T.valueOf($N)", method.resultVar, field.name, field.element, tmp);
@@ -151,6 +139,8 @@ public class SqlMapperImpClassWriter {
     private static MergeMapping merge(MethodInfo method, FieldInfo field) {
         MergeMapping merge = new MergeMapping();
         merge.alias = method.alias != null;
+        merge.enumType = field.enumType;
+
         SqlMapping mapping = method.mappings.get(field.name);
         if (mapping != null) {
             // ignore field
@@ -168,7 +158,9 @@ public class SqlMapperImpClassWriter {
                 // ignore global alias
                 merge.alias = false;
             }
-            merge.enumType = mapping.enumType();
+            if (mapping.enumType() != SqlEnumType.DEFAULT) {
+                merge.enumType = mapping.enumType();
+            }
         }
         return merge;
     }

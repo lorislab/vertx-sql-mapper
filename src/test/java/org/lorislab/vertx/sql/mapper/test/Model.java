@@ -17,7 +17,6 @@ package org.lorislab.vertx.sql.mapper.test;
 
 import io.vertx.core.json.JsonObject;
 import org.lorislab.vertx.sql.mapper.SqlColumn;
-import org.lorislab.vertx.sql.mapper.SqlEnum;
 import org.lorislab.vertx.sql.mapper.SqlEnumType;
 
 import java.time.LocalTime;
@@ -40,7 +39,7 @@ public class Model {
 
     public ModelStatus status;
 
-    @SqlEnum(SqlEnumType.INTEGER)
+    @SqlColumn(enumType = SqlEnumType.INTEGER)
     public ModelStatus statusInteger;
 
     public JsonObject data;
