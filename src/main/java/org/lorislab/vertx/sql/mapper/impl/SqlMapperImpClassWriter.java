@@ -55,10 +55,11 @@ public class SqlMapperImpClassWriter {
                 mb.addStatement("$N $N = $N.get$N($N + $S)", ft.rowMethod, tmp, method.row, ft.rowMethod, method.aliasVar, mapping.column);
             }
         }
-        mb.beginControlFlow("if ($N != null)", tmp);
         if (ft == FieldType.INTEGER) {
+            mb.beginControlFlow("if (0 <= $N && $N < $T.values().length)", tmp, tmp, field.element);
             mb.addStatement("$N.$N = $T.values()[$N]", method.resultVar, field.name, field.element, tmp);
         } else {
+            mb.beginControlFlow("if ($N != null && !$N.isBlank())", tmp, tmp);
             mb.addStatement("$N.$N = $T.valueOf($N)", method.resultVar, field.name, field.element, tmp);
         }
         mb.endControlFlow();

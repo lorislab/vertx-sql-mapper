@@ -23,11 +23,11 @@ public class SimpleClassMapperImpl extends  SimpleClassMapper {
         result.processId = row.getString(Model_.PROCESS_ID);
         result.processVersion = row.getString(Model_.PROCESS_VERSION);
         String resultStatus = row.getString(Model_.STATUS);
-        if (resultStatus != null) {
+        if (resultStatus != null && !resultStatus.isBlank()) {
             result.status = ModelStatus.valueOf(resultStatus);
         }
         Integer resultStatusInteger = row.getInteger(Model_.STATUS_INTEGER);
-        if (resultStatusInteger != null) {
+        if (0 <= resultStatusInteger && resultStatusInteger < ModelStatus.values().length) {
             result.statusInteger = ModelStatus.values()[resultStatusInteger];
         }
         result.data = row.get(JsonObject.class, row.getColumnIndex(Model_.DATA));

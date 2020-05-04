@@ -25,11 +25,11 @@ public class SimpleMapperImpl implements SimpleMapper {
         result.processId = row.getString(Model_.PROCESS_ID);
         result.processVersion = row.getString(Model_.PROCESS_VERSION);
         String resultStatus = row.getString(Model_.STATUS);
-        if (resultStatus != null) {
+        if (resultStatus != null && !resultStatus.isBlank()) {
             result.status = ModelStatus.valueOf(resultStatus);
         }
         Integer resultStatusInteger = row.getInteger(Model_.STATUS_INTEGER);
-        if (resultStatusInteger != null) {
+        if (0 <= resultStatusInteger && resultStatusInteger < ModelStatus.values().length) {
             result.statusInteger = ModelStatus.values()[resultStatusInteger];
         }
         result.data = row.get(JsonObject.class, row.getColumnIndex(Model_.DATA));
@@ -59,11 +59,11 @@ public class SimpleMapperImpl implements SimpleMapper {
         result.processId = row.getString(a + Model_.PROCESS_ID);
         result.processVersion = row.getString(a + Model_.PROCESS_VERSION);
         String resultStatus = row.getString(a + Model_.STATUS);
-        if (resultStatus != null) {
+        if (resultStatus != null && !resultStatus.isBlank()) {
             result.status = ModelStatus.valueOf(resultStatus);
         }
         Integer resultStatusInteger = row.getInteger(a + Model_.STATUS_INTEGER);
-        if (resultStatusInteger != null) {
+        if (0 <= resultStatusInteger && resultStatusInteger < ModelStatus.values().length) {
             result.statusInteger = ModelStatus.values()[resultStatusInteger];
         }
         result.data = row.get(JsonObject.class, row.getColumnIndex(a + Model_.DATA));
@@ -127,7 +127,7 @@ public class SimpleMapperImpl implements SimpleMapper {
         result.processId = row.getString(a + Model_.PROCESS_ID);
         result.processVersion = row.getString(a + Model_.PROCESS_VERSION);
         String resultStatusInteger = row.getString(a + Model_.STATUS_INTEGER);
-        if (resultStatusInteger != null) {
+        if (resultStatusInteger != null && !resultStatusInteger.isBlank()) {
             result.statusInteger = ModelStatus.valueOf(resultStatusInteger);
         }
         result.data = row.get(JsonObject.class, row.getColumnIndex(a + Model_.DATA));
