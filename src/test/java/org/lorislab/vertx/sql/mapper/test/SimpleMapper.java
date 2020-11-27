@@ -20,7 +20,7 @@ import org.lorislab.vertx.sql.mapper.SqlEnumType;
 import org.lorislab.vertx.sql.mapper.SqlMapper;
 import org.lorislab.vertx.sql.mapper.SqlMapping;
 
-@SqlMapper
+@SqlMapper(cdi = false, instanceField = true, staticMethod = true)
 public interface SimpleMapper {
 
     Model map(Row row);

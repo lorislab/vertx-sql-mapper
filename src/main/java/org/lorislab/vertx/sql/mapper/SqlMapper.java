@@ -30,6 +30,25 @@ public @interface SqlMapper {
     String CLASS = "org.lorislab.vertx.sql.mapper.SqlMapper";
 
     /**
+     * Generate mapper as CDI bean
+     *
+     * @return generate mapper as CDI bean.
+     */
+    boolean cdi() default true;
+
+    /**
+     * Mapper CDI bean scoped.
+     * @return the mapper CDI bean scoped.
+     */
+    String cdiScoped() default "javax.enterprise.context.ApplicationScoped";
+
+    /**
+     * Mapper CDI bean annotations.
+     * @return the mapper CDI bean annotations.
+     */
+    Class[] anno() default {};
+
+    /**
      * Define the suffix of the mapper implementation class.
      * @return the suffix of the mapper implementation class.
      */
@@ -45,7 +64,7 @@ public @interface SqlMapper {
      * Disable or enabled static method generator.
      * @return the flag to disable or enable static method.
      */
-    boolean staticMethod() default true;
+    boolean staticMethod() default false;
 
     /**
      * Define the static field name of the mapper.
@@ -53,4 +72,10 @@ public @interface SqlMapper {
      */
     String instanceName() default "INSTANCE";
 
+    /**
+     * Create implementation instance static field.
+     *
+     * @return implementation instance static field.
+     */
+    boolean instanceField() default false;
 }

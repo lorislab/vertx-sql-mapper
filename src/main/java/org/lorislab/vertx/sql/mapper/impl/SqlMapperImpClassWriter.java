@@ -21,12 +21,14 @@ import org.lorislab.vertx.sql.mapper.SqlMapper;
 import org.lorislab.vertx.sql.mapper.SqlMapping;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
+import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class SqlMapperImpClassWriter {
 
@@ -273,14 +275,32 @@ public class SqlMapperImpClassWriter {
         } else {
             classBuilder.superclass(type);
         }
+        if (clazz.mapper.cdi()) {
+            classBuilder.addAnnotation(ClassName.bestGuess(clazz.mapper.cdiScoped()));
+        }
+
+        // custom annotation
+        clazz.mapperMirror.getElementValues().entrySet().stream()
+                .filter(e -> "anno".contentEquals(e.getKey().getSimpleName()))
+                .findFirst().map(Map.Entry::getValue)
+                .ifPresent(a -> {
+                    List<AnnotationValue> tmp = (List<AnnotationValue>) a.getValue();
+                    for (AnnotationValue av : tmp) {
+                        DeclaredType tm = (DeclaredType) av.getValue();
+                        TypeElement te = (TypeElement) tm.asElement();
+                        classBuilder.addAnnotation(ClassName.get(te));
+                    }
+                });
 
         // add static instance
-        classBuilder.addField(
-                FieldSpec.builder(type, clazz.mapper.instanceName())
-                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                        .initializer("new $N()", clazz.name)
-                        .build()
-        );
+        if (clazz.mapper.instanceField()) {
+            classBuilder.addField(
+                    FieldSpec.builder(type, clazz.mapper.instanceName())
+                            .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                            .initializer("new $N()", clazz.name)
+                            .build()
+            );
+        }
 
         return classBuilder;
     }

@@ -78,6 +78,21 @@ public class SqlMapperProcessorTest {
         }
     }
 
+    @Test
+    public void generateCDITest() {
+        try {
+            Compilation compilation = compiler.compile(source(CDISimpleClassMapper.class));
+
+            assertAbout(compilations()).that(compilation)
+                    .generatedSourceFile("org/lorislab/vertx/sql/mapper/test/CDISimpleClassMapperImpl")
+                    .hasSourceEquivalentTo(source(CDISimpleClassMapperImpl.class));
+            assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private JavaFileObject source(Class<?> clazz) {
         return JavaFileObjects.forResource(clazz.getCanonicalName().replace('.', '/') + ".java");
     }

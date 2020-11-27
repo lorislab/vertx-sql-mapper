@@ -6,6 +6,13 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.lorislab.vertx/vertx-sql-mapper?logo=java&style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/org.lorislab.vertx/vertx-sql-mapper)
 
 Vertx SQL mapper for `io.vertx.mutiny.sqlclient.Row` and `io.vertx.sqlclient.Row`
+Default configuration generate CDI bean, to generate only the POJO class use this configuration:
+```java
+@SqlMapper(cdi = false, instanceField = true, staticMethod = true)
+public interface MyMapper {
+
+}
+```
 
 Maven dependency:
 ```xml

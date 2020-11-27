@@ -26,6 +26,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Collections;
@@ -70,7 +71,7 @@ public class SqlMapperProcessor extends AbstractProcessor {
 
     private void writeImplClass(TypeElement element) {
         try {
-            ClassInfo clazzInfo = ClassInfo.build(element);
+            ClassInfo clazzInfo = ClassInfo.build(element, processingEnv);
             SqlMapperImpClassWriter.createMapper(processingEnv, clazzInfo);
         } catch (IOException e) {
             e.printStackTrace();

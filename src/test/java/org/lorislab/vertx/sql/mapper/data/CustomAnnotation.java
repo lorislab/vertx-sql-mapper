@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lorislab.vertx.sql.mapper.test;
+package org.lorislab.vertx.sql.mapper.data;
 
-import io.vertx.sqlclient.Row;
-import org.lorislab.vertx.sql.mapper.SqlMapper;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@SqlMapper(cdi = false, instanceField = true, staticMethod = true)
-public abstract class SimpleClassMapper {
-
-    public abstract Model map(Row row);
-
-    public void test() {
-
-    }
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.CLASS)
+public @interface CustomAnnotation {
 
 }

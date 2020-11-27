@@ -17,9 +17,10 @@ package org.lorislab.vertx.sql.mapper.test;
 
 import io.vertx.sqlclient.Row;
 import org.lorislab.vertx.sql.mapper.SqlMapper;
+import org.lorislab.vertx.sql.mapper.data.CustomAnnotation;
 
-@SqlMapper(cdi = false, instanceField = true, staticMethod = true)
-public abstract class SimpleClassMapper {
+@SqlMapper(anno = {CustomAnnotation.class})
+public abstract class CDISimpleClassMapper {
 
     public abstract Model map(Row row);
 

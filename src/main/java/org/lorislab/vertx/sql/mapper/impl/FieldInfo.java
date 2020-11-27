@@ -57,7 +57,7 @@ public class FieldInfo {
         FieldInfo field = new FieldInfo();
         field.element = element;
         field.name = element.getSimpleName().toString();
-        field.column = field.name;
+        field.column = field.name.toLowerCase();
 
         TypeMirror t = element.asType();
         field.declaredType = (DeclaredType)t;

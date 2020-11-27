@@ -17,10 +17,10 @@ package org.lorislab.vertx.sql.mapper.impl;
 
 import org.lorislab.vertx.sql.mapper.SqlMapper;
 
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.*;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.util.*;
 
 public class ClassInfo {
@@ -35,11 +35,13 @@ public class ClassInfo {
 
     SqlMapper mapper;
 
+    AnnotationMirror mapperMirror;
+
     List<MethodInfo> methods = new ArrayList<>();
 
     Map<String, TypeInfo> models = new HashMap<>();
 
-    public static ClassInfo build(TypeElement beanType) {
+    public static ClassInfo build(TypeElement beanType, ProcessingEnvironment processingEnv) {
         if (beanType == null) {
             return null;
         }
@@ -47,6 +49,11 @@ public class ClassInfo {
         ClassInfo clazz = new ClassInfo();
         clazz.type = beanType;
         clazz.mapper = beanType.getAnnotation(SqlMapper.class);
+
+        Element actionElement = processingEnv.getElementUtils().getTypeElement(SqlMapper.class.getName());
+        TypeMirror sqlMapperType = actionElement.asType();
+        clazz.mapperMirror = beanType.getAnnotationMirrors().stream().filter(x -> x.getAnnotationType().equals(sqlMapperType)).findFirst().orElse(null);
+
         clazz.superName = beanType.getSimpleName().toString();
         clazz.name = clazz.superName + clazz.mapper.suffix();
         clazz.isInterface = beanType.getKind() == ElementKind.INTERFACE;
