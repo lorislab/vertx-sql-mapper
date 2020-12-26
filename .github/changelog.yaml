@@ -1,0 +1,20 @@
+sections:
+- title: Major changes
+  labels:
+    - "release/super-feature"
+- title: Complete changelog
+  labels:
+    - "bug"
+    - "enhancement"
+template: |
+  Maven dependency:
+  ```xml
+  <dependency>
+    <groupId>org.lorislab.vertx</groupId>
+    <artifactId>vertx-sql-mapper</artifactId>
+    <version>{{ .Version }}</version>
+  </dependency>
+  ```
+  {{ range $section := .Sections }}{{ if $section.Items }}### {{ $section.GetTitle }}{{ range $item := $section.Items }}
+  * [#{{ $item.GetID }}]({{ $item.GetURL }}) - {{ $item.GetTitle }}{{ end }}{{ end }}
+  {{ end }}
