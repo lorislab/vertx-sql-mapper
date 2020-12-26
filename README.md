@@ -7,6 +7,7 @@
 
 Vertx SQL mapper for `io.vertx.mutiny.sqlclient.Row` and `io.vertx.sqlclient.Row`
 Default configuration generate CDI bean. To generate only the POJO class use this configuration:
+
 ```java
 @SqlMapper(cdi = false, instanceField = true, staticMethod = true)
 public interface MyMapper {
