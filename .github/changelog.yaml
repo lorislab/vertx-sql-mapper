@@ -6,6 +6,7 @@ sections:
   labels:
     - "bug"
     - "enhancement"
+    - "area/dependencies"
 template: |
   Maven dependency:
   ```xml

@@ -4,9 +4,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import java.util.Arrays;
 import java.util.HashSet;
-import org.lorislab.vertx.sql.mapper.SqlEnumType;
-import org.lorislab.vertx.sql.mapper.SqlMapping;
-import org.lorislab.vertx.sql.mapper.SqlMappings;
 
 public class SimpleMapperImpl implements SimpleMapper {
 
@@ -77,12 +74,6 @@ public class SimpleMapperImpl implements SimpleMapper {
     }
 
     @Override
-    @SqlMappings({
-            @SqlMapping(field = "id", column = "uid"),
-            @SqlMapping(field = "status", ignore = true),
-            @SqlMapping(field = "statusInteger", ignore = true),
-            @SqlMapping(field = "parent", column = "p", alias = "x")
-    })
     public Model mapSqlMapping(Row row) {
         if (row == null) {
             return null;
@@ -105,12 +96,6 @@ public class SimpleMapperImpl implements SimpleMapper {
     }
 
     @Override
-    @SqlMappings({
-            @SqlMapping(field = "id", column = "uid"),
-            @SqlMapping(field = "status", ignore = true),
-            @SqlMapping(field = "statusInteger", enumType = SqlEnumType.STRING),
-            @SqlMapping(field = "parent", column = "p", alias = "x")
-    })
     public Model mapSqlMapping(Row row, String alias) {
         if (row == null) {
             return null;
