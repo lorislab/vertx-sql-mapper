@@ -5,6 +5,15 @@
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/lorislab/vertx-sql-mapper?sort=semver&logo=github&style=for-the-badge)](https://github.com/lorislab/vertx-sql-mapper/releases/latest)
 [![Maven Central](https://img.shields.io/maven-central/v/org.lorislab.vertx/vertx-sql-mapper?logo=java&style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/org.lorislab.vertx/vertx-sql-mapper)
 
+Maven dependency:
+```xml
+<dependency>
+    <groupId>org.lorislab.vertx</groupId>
+    <artifactId>vertx-sql-mapper</artifactId>
+    <version>{latest-release-version}</version>
+</dependency>
+``` 
+
 Vertx SQL mapper for `io.vertx.mutiny.sqlclient.Row` and `io.vertx.sqlclient.Row`
 Default configuration generate CDI bean. To generate only the POJO class use this configuration:
 
@@ -14,15 +23,6 @@ public interface MyMapper {
 
 }
 ```
-
-Maven dependency:
-```xml
-<dependency>
-    <groupId>org.lorislab.vertx</groupId>
-    <artifactId>vertx-sql-mapper</artifactId>
-    <version>{latest-release-version}</version>
-</dependency>
-``` 
 
 > No runtime dependencies are created in the generated classes.
 
