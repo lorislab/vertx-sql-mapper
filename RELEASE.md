@@ -2,10 +2,7 @@
 
 ### Create a release
 ```bash
-mvn semver-release:release-create
-```
-
-## Create a patch branch
-```bash
-mvn semver-release:patch-create -DpatchVersion=x.x.0
+mvn org.lorislab.maven:semver-release-maven-plugin:0.6.0:release-create -DskipPush=true
+git push --tags
+git push
 ```

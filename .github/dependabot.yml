@@ -8,10 +8,7 @@ updates:
       timezone: Europe/Paris
     open-pull-requests-limit: 3
     labels:
-      - area/dependencies
+      - dependencies
     allow:
-      #Quarkus
       - dependency-name: com.squareup:javapoet
-      #Maven
-      - dependency-name: org.lorislab.maven:semver-release-maven-plugin
     rebase-strategy: disabled
